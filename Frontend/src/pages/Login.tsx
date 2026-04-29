@@ -1,10 +1,18 @@
 import { useState } from "react";
 import { LOGIN_USER } from "../graphql/mutations";
-import { useMutation } from "@apollo/client";
+import { useQuery } from "@apollo/client";
+import { useNavigate } from "react-router-dom";
+import { useUser } from "../Hooks/useUser";
+import { GET_USER } from "../graphql/queries";
 
 export const Login = () => {
 
-    const [loginUser, {loading, error }] = useMutation(LOGIN_USER);
+    const navigate = useNavigate();
+    const {login, loginLoading, loginError, message, user, setMessage} = useUser();
+
+    const {refetch} = useQuery(GET_USER, {
+        skip: !user
+    });
 
     const [formData, setFormData] = useState({
         username: '',
@@ -18,29 +26,19 @@ export const Login = () => {
         })
     };
 
-    async function Login(username: string, password: string)
-    {
-        try {
-            await loginUser({
-                variables: { username, password}
-            })
-
-            console.log("Login successful");
-        } catch (err) {
-            console.error("Login failed:", err);
-        }
-    }
 
     const handleSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
         e.preventDefault();
+        await login(formData.username, formData.password, navigate);
 
-        await Login(formData.username, formData.password);
-
-        if (!error)
+        if (!loginError)
         {
-            console.log("Login successful");
+          refetch();
+          setMessage("Login successful");
         }
     }
+
+    if (loginLoading) return <p>Loading...</p>;
 
     return (
       <>
@@ -66,6 +64,8 @@ export const Login = () => {
             />
           </div>
           <button type="submit">Login</button>
+          {message && <p>{message}</p>}
+          {loginError && <p style={{color: "red"}}>Error: {loginError.message}</p>}
         </form>
       </>
     )
