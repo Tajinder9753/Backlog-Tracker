@@ -1,7 +1,7 @@
 import { createContext, useState } from "react";
 import { useQuery, useMutation, ApolloError } from "@apollo/client";
 import { GET_USER } from "../graphql/queries";
-import { LOGIN_USER, REGISTER_USER } from "../graphql/mutations";
+import { LOGIN_USER, REGISTER_USER, LOGOUT_USER } from "../graphql/mutations";
 
 interface UserContextType {
     user: any;
@@ -9,6 +9,7 @@ interface UserContextType {
     loginLoading: boolean;
     loginError: ApolloError | undefined;
     register: (username: string, password: string, email: string, navigate: Function) => Promise<void>;
+    logout: () => Promise<void>;
     registerLoading: boolean;
     registerError: ApolloError | undefined;
     message: string;
@@ -29,6 +30,11 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     const [loginUser, {loading: loginLoading, error: loginError}] = useMutation(LOGIN_USER);
 
     const [registerUser, {loading: registerLoading, error: registerError}] = useMutation(REGISTER_USER);
+
+    const [logoutUser] = useMutation(LOGOUT_USER, {
+        refetchQueries: [{ query: GET_USER }],
+        awaitRefetchQueries: true
+    });
 
     async function login(username : string, password : string, navigate : Function) 
     {
@@ -69,12 +75,24 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
         }
     }
 
+    async function logout()
+    {
+        try {
+            await logoutUser();
+            setMessage("Logout successful");
+        } catch (err) {
+            console.error("Logout failed:", err);
+            setMessage("Logout Failed");
+        }
+    }
+
     return (
         <UserContext.Provider
             value={{
                 user: userData?.getUser,
                 login,
                 register,
+                logout,
                 registerLoading,
                 registerError,
                 loginLoading,

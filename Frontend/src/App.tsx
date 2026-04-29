@@ -6,12 +6,14 @@ import { Dashboard } from './pages/Dashboard'
 import { UserProvider } from './context/UserContext'
 import ProtectedRoutes from './components/ProtectedRoutes'
 import { Register } from './pages/Register'
+import { Navbar } from './components/Navbar'
 
 function App() {
 
   return (
     <>
     <UserProvider>
+      <Navbar />
         <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />

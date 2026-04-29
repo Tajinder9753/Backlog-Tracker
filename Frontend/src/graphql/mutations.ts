@@ -19,3 +19,9 @@ mutation LoginUser($username: String!, $password: String!) {
     }
 }
 `
+
+export const LOGOUT_USER = gql`
+mutation LogoutUser {
+    logoutUser 
+}
+`
