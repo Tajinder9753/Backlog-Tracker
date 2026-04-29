@@ -39,6 +39,19 @@ export const gameResolver = {
             }
 
             return game;
+        },
+
+        popularGames: async () => {
+        try {
+            const res = await fetch(
+            `https://api.rawg.io/api/games?key=${process.env.RAWG_API_KEY}&ordering=-rating&page_size=20`
+            );
+            const data = await res.json();
+            return data.results;
+        } catch (err) {
+            console.error('RAWG fetch error:', err);
+            throw new Error('Failed to fetch games from RAWG');
+        }
         }
     },
 
