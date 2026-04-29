@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { LOGIN_USER } from "../graphql/mutations";
 import { useQuery } from "@apollo/client";
 import { useNavigate } from "react-router-dom";
 import { useUser } from "../Hooks/useUser";
@@ -8,7 +7,7 @@ import { GET_USER } from "../graphql/queries";
 export const Login = () => {
 
     const navigate = useNavigate();
-    const {login, loginLoading, loginError, message, user, setMessage} = useUser();
+    const {login, loginLoading, loginError, message, user} = useUser();
 
     const {refetch} = useQuery(GET_USER, {
         skip: !user
@@ -34,7 +33,6 @@ export const Login = () => {
         if (!loginError)
         {
           refetch();
-          setMessage("Login successful");
         }
     }
 
