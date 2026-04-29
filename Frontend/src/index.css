@@ -5,6 +5,14 @@
 
 @custom-variant dark (&:is(.dark *));
 
+@theme {
+   --color-myGrey: #e4f1fe;
+  --color-myLightBlue: #8dc6ff;
+  --color-myBlack: #22313f;
+  --color-myLightBlack: #34495e;
+  --color-myTurquoise: #00adb5
+}
+
 @theme inline {
     --font-heading: var(--font-sans);
     --font-sans: 'Geist Variable', sans-serif;
@@ -49,7 +57,7 @@
 }
 
 :root {
-    --background: oklch(1 0 0);
+    --background: oklch(17.423% 0.00165 16.654);
     --foreground: oklch(0.145 0 0);
     --card: oklch(1 0 0);
     --card-foreground: oklch(0.145 0 0);

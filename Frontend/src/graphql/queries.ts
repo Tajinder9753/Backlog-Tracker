@@ -9,3 +9,13 @@ export const GET_USER = gql `
         }
     }
 `
+
+export const POPULAR_GAMES = gql`
+    query PopularGames {
+        popularGames {
+            name
+            background_image
+            rating
+        }
+    }
+`

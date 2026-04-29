@@ -40,31 +40,38 @@ export const Login = () => {
 
     return (
       <>
-        <form onSubmit={handleSubmit}>
-          <div>
-            <label htmlFor="username">Username:</label>
-            <input
-              type="text"
-              id="username"
-              name="username"
-              value={formData.username}
-              onChange={handleChange}
-            />
-          </div>
-          <div>
-            <label htmlFor="password">Password:</label>
-            <input
-              type="password"
-              id="password"
-              name="password"
-              value={formData.password}
-              onChange={handleChange}
-            />
-          </div>
-          <button type="submit">Login</button>
-          {message && <p>{message}</p>}
-          {loginError && <p style={{color: "red"}}>Error: {loginError.message}</p>}
-        </form>
+      <div className="flex items-center justify-center rounded-md min-h-screen ">
+        <div className="w-full max-w-lg p-20 rounded-lg shadow-lg bg-myGrey h-200">
+          <h1 className="text-4xl text-black font-bold flex justify-center">Login</h1>
+            <form onSubmit={handleSubmit} className="pt-10">
+              <div>
+                <label htmlFor="username">Username:</label>
+                <input
+                  type="text"
+                  id="username"
+                  name="username"
+                  value={formData.username}
+                  onChange={handleChange}
+                />
+              </div>
+              <div>
+                <label htmlFor="password">Password:</label>
+                <input
+                  type="password"
+                  id="password"
+                  name="password"
+                  value={formData.password}
+                  onChange={handleChange}
+                />
+              </div>
+              <button type="submit">Login</button>
+              {message && <p>{message}</p>}
+              {loginError && <p style={{color: "red"}}>Error: {loginError.message}</p>}
+            </form>
+        </div>
+
+      </div>
+
       </>
     )
 }

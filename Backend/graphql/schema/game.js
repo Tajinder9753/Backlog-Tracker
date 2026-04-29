@@ -17,6 +17,7 @@ export const gameTypeDefs = `
     type Game {
     id: ID!
     name: String!
+    description: String
     background_image: String
     rating: Float
     released: String
@@ -35,6 +36,7 @@ export const gameTypeDefs = `
 
     input AddGameInput {
         name: String!
+        description: String
         background_image: String
         rating: Float
         released: String
