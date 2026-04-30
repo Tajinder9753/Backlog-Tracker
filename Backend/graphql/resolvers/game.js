@@ -95,11 +95,6 @@ export const gameResolver = {
                     `https://api.rawg.io/api/games/${args.gameID}?key=${process.env.RAWG_API_KEY}`
                 );
                 const data = await res.json();
-                
-                // Add these logs
-                console.log('All cookies:', context.req.cookies);
-                console.log('Token:', context.req.cookies.token);
-                console.log('JWT_SECRET:', JWT_SECRET);
 
                 const token = context.req.cookies.token;
                 if (!token) return data;
