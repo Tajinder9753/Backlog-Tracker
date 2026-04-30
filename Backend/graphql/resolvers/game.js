@@ -41,10 +41,10 @@ export const gameResolver = {
             return game;
         },
 
-        popularGames: async () => {
+        popularGames: async (_, args) => {
         try {
             const res = await fetch(
-            `https://api.rawg.io/api/games?key=${process.env.RAWG_API_KEY}&ordering=-rating&page_size=20`
+            `https://api.rawg.io/api/games?key=${process.env.RAWG_API_KEY}&ordering=-rating&page_size=20&page=${args.pageNumber}`
             );
             const data = await res.json();
             return data.results;
@@ -52,6 +52,33 @@ export const gameResolver = {
             console.error('RAWG fetch error:', err);
             throw new Error('Failed to fetch games from RAWG');
         }
+        },
+
+        searchGame: async(_, args) => {
+
+            try {
+                const res = await fetch (
+                    `https://api.rawg.io/api/games?key=${process.env.RAWG_API_KEY}&search=${args.name}&page_size=10`
+                );
+                const data = await res.json();
+                return data.results;
+            } catch (err) {
+                console.error("RAWG fetch error: ", err);
+                throw new Error ("Failed to fetch game from RAWG");
+            }
+        },
+
+        gameDetails: async (_, args) => {
+            try {
+                const res = await fetch (
+                    `https://api.rawg.io/api/games/${args.gameID}?key=${process.env.RAWG_API_KEY}`
+                );
+                const data = await res.json();
+                return data;
+            } catch (err) {
+                console.error("RAWG fetch error: ", err);
+                throw new Error ("failed to fetch game from RAWG")
+            }
         }
     },
 

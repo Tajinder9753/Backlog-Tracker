@@ -11,8 +11,19 @@ export const GET_USER = gql `
 `
 
 export const POPULAR_GAMES = gql`
-    query PopularGames {
-        popularGames {
+    query PopularGames($pageNumber: Int!) {
+        popularGames(pageNumber: $pageNumber) {
+            id
+            name
+            background_image
+            rating
+        }
+    }
+`
+
+export const SEARCH_GAME = gql`
+    query SearchGame ($name: String!) {
+        searchGame (name: $name) {
             name
             background_image
             rating

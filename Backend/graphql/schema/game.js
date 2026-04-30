@@ -49,7 +49,9 @@ export const gameTypeDefs = `
     type Query {
         getGames: [Game!]!
         getGame(id: ID!): Game!
-        popularGames: [Game!]!
+        popularGames(pageNumber: Int!): [Game!]!
+        searchGame(name: String!): [Game!]!
+        gameDetails(gameID: ID!): Game!
     }
 
     type Mutation {
