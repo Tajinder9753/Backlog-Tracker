@@ -5,7 +5,7 @@ import { LOGIN_USER, REGISTER_USER, LOGOUT_USER } from "../graphql/mutations";
 
 interface UserContextType {
     user: any;
-    login: (username: string, password: string, navigate: Function) => Promise<void>;
+    login: (username: string, password: string) => Promise<boolean>;
     loginLoading: boolean;
     loginError: ApolloError | undefined;
     register: (username: string, password: string, email: string, navigate: Function) => Promise<void>;
@@ -36,26 +36,24 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
         awaitRefetchQueries: true
     });
 
-    async function login(username : string, password : string, navigate : Function) 
-    {
-        try {
-            const {data} = await loginUser({
-                variables: { username, password }
-            });
-
-            if (data?.loginUser)
-            {
-                setMessage("Login successful");
-                navigate("/dashboard");
-            } else {
-                setMessage("Login Failed");
-            }
-        } catch (err)
-        {
-            console.error("Login failed:", err);
+ async function login(username: string, password: string): Promise<boolean> {
+    try {
+        const { data } = await loginUser({
+            variables: { username, password }
+        });
+        if (data?.loginUser) {
+            setMessage("Login successful");
+            return true; 
+        } else {
             setMessage("Login Failed");
+            return false;
         }
+    } catch (err) {
+        console.error("Login failed:", err);
+        setMessage("Login Failed");
+        return false;
     }
+}
 
     async function register(username: string, password: string, email: string, navigate: Function)
     {

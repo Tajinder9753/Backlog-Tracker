@@ -4,10 +4,14 @@ import { Button } from "./ui/button";
 import { Search } from "lucide-react";
 
 export const Navbar = () => {
-    const {user, logout} = useUser();
+    const {user, logout, setMessage} = useUser();
     const navigate = useNavigate();
     const handleLogout = async () => {
         await logout();
+        setTimeout(()=> {
+            setMessage("");
+             navigate("/login");
+        }, 1000);
     }
 
     return (
