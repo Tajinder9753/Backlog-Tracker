@@ -17,6 +17,7 @@ export const POPULAR_GAMES = gql`
             name
             background_image
             rating
+            myRating
         }
     }
 `
@@ -24,9 +25,43 @@ export const POPULAR_GAMES = gql`
 export const SEARCH_GAME = gql`
     query SearchGame ($name: String!) {
         searchGame (name: $name) {
+            id
             name
             background_image
             rating
+        }
+    }
+`
+
+export const GAME_DETAILS = gql`
+    query GameDetails($gameID: String!){
+        gameDetails(gameID: $gameID) {
+            id
+            name
+            background_image
+            rating
+            myRating
+            released
+            platforms {
+                platform {
+                    id
+                    name
+                }
+            }
+            myPlatforms {
+                platform {
+                    id
+                    name
+                }
+            }
+            genres {
+                id
+                name
+            }
+            review
+            description
+            owned
+            status
         }
     }
 `

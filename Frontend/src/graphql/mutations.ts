@@ -25,3 +25,11 @@ mutation LogoutUser {
     logoutUser 
 }
 `
+
+export const ADD_GAME = gql`
+mutation AddGame($input: AddGameInput!) {
+    addGame(input: $input) {
+        name
+    }
+}
+`

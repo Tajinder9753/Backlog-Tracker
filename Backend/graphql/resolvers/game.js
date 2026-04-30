@@ -2,6 +2,8 @@ import dotenv from 'dotenv';
 import {Game} from "../../models/Game.js";
 import jwt from 'jsonwebtoken';
 
+dotenv.config();
+
 const JWT_SECRET = process.env.JWT_SECRET;
 
 export const gameResolver = {
@@ -41,13 +43,32 @@ export const gameResolver = {
             return game;
         },
 
-        popularGames: async (_, args) => {
+        popularGames: async (_, args, context) => {
         try {
             const res = await fetch(
             `https://api.rawg.io/api/games?key=${process.env.RAWG_API_KEY}&ordering=-rating&page_size=20&page=${args.pageNumber}`
             );
             const data = await res.json();
-            return data.results;
+            const rawgGames = data.results;
+
+            const token = context.req.cookies.token;
+            if (!token) return rawgGames;
+
+            const payload = jwt.verify(token, JWT_SECRET);
+            const rawgIds = rawgGames.map(g=> String(g.id));
+            const savedGames = await Game.find({
+                user: payload._id,
+                rawgId: {$in: rawgIds}
+            });
+
+            const savedMap = {};
+            savedGames.forEach(g=> {savedMap[g.rawgId] = g;});
+
+            return rawgGames.map(game => ({
+                ...game,
+                myRating: savedMap[String(game.id)]?.myRating ?? null
+            }));
+
         } catch (err) {
             console.error('RAWG fetch error:', err);
             throw new Error('Failed to fetch games from RAWG');
@@ -68,13 +89,35 @@ export const gameResolver = {
             }
         },
 
-        gameDetails: async (_, args) => {
+        gameDetails: async (_, args, context) => {
             try {
                 const res = await fetch (
                     `https://api.rawg.io/api/games/${args.gameID}?key=${process.env.RAWG_API_KEY}`
                 );
                 const data = await res.json();
-                return data;
+                
+                // Add these logs
+                console.log('All cookies:', context.req.cookies);
+                console.log('Token:', context.req.cookies.token);
+                console.log('JWT_SECRET:', JWT_SECRET);
+
+                const token = context.req.cookies.token;
+                if (!token) return data;
+
+                const payload = jwt.verify(token, JWT_SECRET);
+                const savedGame = await Game.findOne({
+                    user: payload._id,
+                    rawgId: String(args.gameID)
+                })
+
+                return {
+                    ...data,
+                    myRating: savedGame?.myRating ?? null,
+                    review: savedGame?.review ?? null,
+                    myPlatforms: savedGame?.myPlatforms ?? null,
+                    status: savedGame?.status ?? null,
+                    owned: savedGame?.owned ?? null
+                }
             } catch (err) {
                 console.error("RAWG fetch error: ", err);
                 throw new Error ("failed to fetch game from RAWG")

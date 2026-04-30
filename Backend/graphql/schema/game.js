@@ -16,34 +16,41 @@ export const gameTypeDefs = `
 
     type Game {
     id: ID!
+    rawgId: String!
     name: String!
     description: String
     background_image: String
     rating: Float
+    myRating: Float
     released: String
     platforms: [GamePlatform]
     myPlatforms: [GamePlatform]
     genres: [Genre]
     review: String
+    owned: Boolean
+    status: String
     }
 
     input UpdateGameInput {
-        name: String
-        rating: Float
+        myRating: Float
         myPlatforms: [ID!]
         review: String
+        status: String
     }
 
     input AddGameInput {
+        rawgId: String!
         name: String!
         description: String
         background_image: String
-        rating: Float
+        myRating: Float
         released: String
         platforms: [ID!]
         myPlatforms: [ID!]
         genres: [ID!]
         review: String
+        status: String!
+        owned: Boolean!
     }
 
     type Query {
@@ -51,7 +58,7 @@ export const gameTypeDefs = `
         getGame(id: ID!): Game!
         popularGames(pageNumber: Int!): [Game!]!
         searchGame(name: String!): [Game!]!
-        gameDetails(gameID: ID!): Game!
+        gameDetails(gameID: String!): Game!
     }
 
     type Mutation {

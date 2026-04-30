@@ -7,6 +7,7 @@ import { UserProvider } from './context/UserContext'
 import ProtectedRoutes from './components/ProtectedRoutes'
 import { Register } from './pages/Register'
 import { Navbar } from './components/Navbar'
+import { GameDetails } from './pages/GameDetails'
 
 function App() {
 
@@ -18,6 +19,7 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path='/game/:gameID' element={<GameDetails />} />
 
         <Route element={<ProtectedRoutes />}>
           <Route path="/dashboard" element={<Dashboard />} />

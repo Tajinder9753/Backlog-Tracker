@@ -53,8 +53,8 @@ export const userResolvers = {
             context.res.cookie("token", token, { 
                 httpOnly: true, 
                 maxAge: jwtExpirySeconds * 1000,
-                secure: true,
-                sameSite: "none"
+                //secure: true,
+                //sameSite: "none"
                 });
 
             return user;

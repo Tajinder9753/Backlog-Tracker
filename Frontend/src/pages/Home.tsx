@@ -15,10 +15,13 @@ import {
   PaginationEllipsis,
 } from "@/components/ui/pagination"
 import { useEffect, useState } from "react";
+import { useUser } from "@/Hooks/useUser";
 
 const TOTAL_PAGES = 50;
 
 export const Home = () => {
+    const {user} = useUser();
+
   const [currentPage, setCurrentPage] = useState(1);
 
   const { loading, error, data } = useQuery(POPULAR_GAMES, {
@@ -106,6 +109,12 @@ export const Home = () => {
                   {game.rating > 0 && (
                     <p className="text-white/40 text-xs mt-1">
                       ★ {game.rating.toFixed(1)}
+                    </p>
+                  )}
+
+                  {user && game.myRating && (
+                    <p className="text-white/80 text-xs mt-1">
+                        ★ {game.myRating.toFixed(1)} ||
                     </p>
                   )}
                 </CardHeader>
