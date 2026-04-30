@@ -37,6 +37,7 @@ export const GAME_DETAILS = gql`
     query GameDetails($gameID: String!){
         gameDetails(gameID: $gameID) {
             id
+            mongoId
             name
             background_image
             rating

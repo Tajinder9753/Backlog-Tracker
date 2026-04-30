@@ -107,6 +107,7 @@ export const gameResolver = {
 
                 return {
                     ...data,
+                    mongoId: savedGame?._id ?? null,
                     myRating: savedGame?.myRating ?? null,
                     review: savedGame?.review ?? null,
                     myPlatforms: savedGame?.myPlatforms ?? null,
@@ -174,9 +175,7 @@ export const gameResolver = {
             if (game.user != payload._id) {
                 throw new Error('Not Authorized');
             }
-
-            await Game.findByIdAndDelete(args.id);
-            return "Game Deleted Successfully";
+            return await Game.findByIdAndDelete(args.id);
         }
     }
 }

@@ -14,7 +14,7 @@ const gameSchema = new mongoose.Schema({
   myPlatforms: [{ type: String }],
   review: { type: String },
   status: {type: String, enum: ["Playing", "Completed", "Backlog", "Re-playing"], default: "Backlog"},
-  Owned: {type: Boolean},
+  owned: {type: Boolean},
   createdAt: { type: Date, default: Date.now },
 });
 

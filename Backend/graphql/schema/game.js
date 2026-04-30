@@ -17,6 +17,7 @@ export const gameTypeDefs = `
     type Game {
     id: ID!
     rawgId: String!
+    mongoId: ID
     name: String!
     description: String
     background_image: String
@@ -64,6 +65,6 @@ export const gameTypeDefs = `
     type Mutation {
         addGame(input: AddGameInput!): Game!
         updateGame(id: ID!, input: UpdateGameInput!): Game!
-        deleteGame(id: ID!): String!
+        deleteGame(id: ID!): Game!
     }
 `

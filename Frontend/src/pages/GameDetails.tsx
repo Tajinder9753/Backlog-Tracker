@@ -1,14 +1,26 @@
 import { Button } from "@/components/ui/button";
-import { ADD_GAME } from "@/graphql/mutations";
+import { ADD_GAME, DELETE_GAME } from "@/graphql/mutations";
 import { GAME_DETAILS } from "@/graphql/queries"
+import { useUser } from "@/Hooks/useUser";
 import { useMutation, useQuery } from "@apollo/client"
+import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom"
 
 export const GameDetails = () => {
+    const {user} = useUser();
     const {gameID} = useParams();
     const {loading, error, data} = useQuery(GAME_DETAILS, {variables: {gameID} })
 
     const [addGame] = useMutation(ADD_GAME)
+    const [deleteGame] = useMutation(DELETE_GAME)
+
+    const [gameAdded, setGameAdded] = useState(false);
+
+    useEffect(() => {
+        if (data?.gameDetails) {
+            setGameAdded(data.gameDetails.owned ?? false);
+        }
+    }, [data])
 
     const handleAddGame = async() => {
         const input = {
@@ -27,9 +39,28 @@ export const GameDetails = () => {
 
         };
 
-        await addGame({
+        try {
+            await addGame({
             variables: {input}
         })
+        setGameAdded(true);
+        } catch (err) {
+            console.log(err);
+        }
+
+    }
+
+    const handleDeleteGame = async () => {
+        const id = data.gameDetails.mongoId;
+        try{
+            await deleteGame({
+                variables: {id}
+            })
+
+            setGameAdded(false);
+        } catch (err) {
+            console.log(err);
+        }
     }
 
     if (loading) return <p className="text-white">Loading Game...</p>
@@ -80,7 +111,9 @@ export const GameDetails = () => {
                 {data.gameDetails.review && (
                     <p className="text-white">{data.gameDetails.review}</p>
                 )}
-                {data.gameDetails.owned ? <Button className="text-white" variant={"destructive"}>Remove Game</Button> : <Button className="text-white" onClick={handleAddGame}>Add Game</Button>}
+                {user && (
+                    gameAdded ? <Button className="text-white" variant={"destructive"} onClick={handleDeleteGame}>Remove Game</Button> : <Button className="text-white" onClick={handleAddGame}>Add Game</Button>
+                )}
             </div>
         </>
     )
