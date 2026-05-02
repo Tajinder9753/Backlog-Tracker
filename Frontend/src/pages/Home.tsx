@@ -16,10 +16,13 @@ import {
 } from "@/components/ui/pagination"
 import { useEffect, useState } from "react";
 import { useUser } from "@/Hooks/useUser";
+import { useNavigate } from "react-router-dom";
 
 const TOTAL_PAGES = 50;
 
 export const Home = () => {
+
+  const navigate = useNavigate();
     const {user} = useUser();
 
   const [currentPage, setCurrentPage] = useState(1);
@@ -86,6 +89,7 @@ export const Home = () => {
                 className="bg-myBlack border border-white/20 rounded-lg overflow-hidden
                            group cursor-pointer transition-all duration-200
                            hover:border-white/60 hover:-translate-y-0.5 hover:shadow-xl"
+                onClick={() => navigate(`/game/${game.id}`)}
               >
                 <div className="w-full aspect-video overflow-hidden">
                   {game.background_image ? (
