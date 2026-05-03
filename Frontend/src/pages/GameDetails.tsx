@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { ADD_GAME, DELETE_GAME, UPDATE_GAME } from "@/graphql/mutations";
-import { GAME_DETAILS } from "@/graphql/queries"
+import { GAME_DETAILS, GET_MY_GAMES } from "@/graphql/queries"
 import { useUser } from "@/Hooks/useUser";
 import { useMutation, useQuery } from "@apollo/client"
 import { useEffect, useState } from "react";
@@ -19,14 +19,14 @@ export const GameDetails = () => {
     const {loading, error, data} = useQuery(GAME_DETAILS, {variables: {gameID} })
 
     const [addGame] = useMutation(ADD_GAME, {
-        refetchQueries: [{query: GAME_DETAILS, variables: {gameID}}]
+        refetchQueries: [{query: GAME_DETAILS, variables: {gameID}}, {query: GET_MY_GAMES}]
     })
     const [deleteGame] = useMutation(DELETE_GAME, {
-        refetchQueries: [{query: GAME_DETAILS, variables: {gameID}}]
+        refetchQueries: [{query: GAME_DETAILS, variables: {gameID}}, {query: GET_MY_GAMES}]
     })
 
     const [updateGame] = useMutation(UPDATE_GAME, {
-        refetchQueries: [{query: GAME_DETAILS, variables: {gameID}}]
+        refetchQueries: [{query: GAME_DETAILS, variables: {gameID}}, {query: GET_MY_GAMES}]
     })
 
     const [gameAdded, setGameAdded] = useState(false);
@@ -34,7 +34,7 @@ export const GameDetails = () => {
     useEffect(() => {
         if (data?.gameDetails) {
             setGameAdded(data.gameDetails.owned ?? false);
-            setFormData({...formData, myPlatforms: data.gameDetails.myPlatforms})
+            setFormData({...formData, myPlatforms: data.gameDetails.myPlatforms ?? []})
         }
     }, [data])
 
@@ -166,7 +166,7 @@ export const GameDetails = () => {
                     dangerouslySetInnerHTML={{ __html: data.gameDetails.description }}
                 />
 
-                {data.gameDetails.review && (
+                {user && data.gameDetails.review && (
                     <div className="border-l-2 border-white/20 pl-4">
                     <p className="text-xs uppercase tracking-widest text-white/40 mb-1">Your Review</p>
                     <p className="text-white/80 text-sm italic">{data.gameDetails.review}</p>
@@ -238,7 +238,7 @@ export const GameDetails = () => {
                                                     <div key={p.platform.id}>
                                                         <Checkbox
                                                         name={p.platform.name}
-                                                        checked={formData.myPlatforms.includes(p.platform.name)}
+                                                        checked={formData.myPlatforms.includes(p.platform.name) || undefined}
                                                         value={p.platform.name}
                                                         onCheckedChange={(checked) => {
                                                             setFormData({
@@ -276,7 +276,7 @@ export const GameDetails = () => {
                             </form>
                         </Dialog>
                     )}
-                    {gameAdded && (
+                    {user && gameAdded && (
                         <Dialog>
                             <form>
                                 <DialogTrigger asChild>
@@ -366,7 +366,7 @@ export const GameDetails = () => {
                 )}
 
                 {/* User Rating */}
-                {data.gameDetails.myRating && (
+                {user && data.gameDetails.myRating && (
                     <div className="bg-myLightBlack border border-white/10 rounded-lg p-4 flex flex-col gap-2">
                     <p className="text-xs uppercase tracking-widest text-white/40">Your Rating</p>
                     <Rating
@@ -407,7 +407,7 @@ export const GameDetails = () => {
                 </div>
 
                 {/* Owned Platforms */}
-                {data.gameDetails.myPlatforms?.length > 0 && (
+                {user && data.gameDetails.myPlatforms?.length > 0 && (
                 <div className="bg-myLightBlack border border-white/10 rounded-lg p-4">
                     <p className="text-xs uppercase tracking-widest text-white/40 mb-3">Your Platforms</p>
                     <div className="flex flex-wrap gap-2">

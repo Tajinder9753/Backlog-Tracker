@@ -22,6 +22,20 @@ export const POPULAR_GAMES = gql`
     }
 `
 
+export const GET_MY_GAMES = gql`
+    query GetGames{
+        getGames{
+            id
+            rawgId
+            name
+            background_image
+            rating
+            myRating
+            status
+        }
+    }
+`
+
 export const SEARCH_GAME = gql`
     query SearchGame ($name: String!) {
         searchGame (name: $name) {
@@ -29,6 +43,7 @@ export const SEARCH_GAME = gql`
             name
             background_image
             rating
+            myRating
         }
     }
 `
