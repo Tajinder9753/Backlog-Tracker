@@ -49,12 +49,7 @@ export const GAME_DETAILS = gql`
                     name
                 }
             }
-            myPlatforms {
-                platform {
-                    id
-                    name
-                }
-            }
+            myPlatforms
             genres {
                 id
                 name

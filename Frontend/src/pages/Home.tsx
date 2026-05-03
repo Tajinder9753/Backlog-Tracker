@@ -117,8 +117,8 @@ export const Home = () => {
                   )}
 
                   {user && game.myRating && (
-                    <p className="text-white/80 text-xs mt-1">
-                        ★ {game.myRating.toFixed(1)} ||
+                    <p className="text-yellow-500/80 text-xs mt-1">
+                        ★ {game.myRating.toFixed(1)}
                     </p>
                   )}
                 </CardHeader>

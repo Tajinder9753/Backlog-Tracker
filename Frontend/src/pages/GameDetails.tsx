@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { ADD_GAME, DELETE_GAME } from "@/graphql/mutations";
+import { ADD_GAME, DELETE_GAME, UPDATE_GAME } from "@/graphql/mutations";
 import { GAME_DETAILS } from "@/graphql/queries"
 import { useUser } from "@/Hooks/useUser";
 import { useMutation, useQuery } from "@apollo/client"
@@ -25,22 +25,33 @@ export const GameDetails = () => {
         refetchQueries: [{query: GAME_DETAILS, variables: {gameID}}]
     })
 
+    const [updateGame] = useMutation(UPDATE_GAME, {
+        refetchQueries: [{query: GAME_DETAILS, variables: {gameID}}]
+    })
+
     const [gameAdded, setGameAdded] = useState(false);
 
     useEffect(() => {
         if (data?.gameDetails) {
             setGameAdded(data.gameDetails.owned ?? false);
+            setFormData({...formData, myPlatforms: data.gameDetails.myPlatforms})
         }
     }, [data])
 
 
 
-    const [formData, setFormData] = useState({
-    myRating: 0,
-    status: '',
-    review: '',
-    owned: true,
-    myPlatforms: []
+    const [formData, setFormData] = useState<{
+        myRating: number;
+        status: string;
+        review: string;
+        owned: boolean;
+        myPlatforms: string[];
+    }>({
+        myRating: 0,
+        status: '',
+        review: '',
+        owned: true,
+        myPlatforms: []
     });
     
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -64,12 +75,12 @@ export const GameDetails = () => {
             description: data.gameDetails.description,
             background_image: data.gameDetails.background_image,
             released: data.gameDetails.released,
-            platforms: [],
-            myPlatforms: [],
-            genres: [],
-            myRating: 3.0,
-            review: "This is a good game",
-            status: "Playing",
+            platforms: data.gameDetails.platforms?.map((p: any) => p.platform.name) || [],
+            myPlatforms: formData.myPlatforms,
+            genres: data.gameDetails.genres?.map((g: any) => g.name) || [],
+            myRating: formData.myRating,
+            review: formData.review,
+            status: formData.status,
             owned: true
 
         };
@@ -94,6 +105,23 @@ export const GameDetails = () => {
 
             setGameAdded(false);
             
+        } catch (err) {
+            console.log(err);
+        }
+    }
+
+    const handleUpdateGame = async() => {
+        const input = {
+            myRating: formData.myRating || data.gameDetails.myRating,
+            myPlatforms: formData.myPlatforms || data.gameDetails.myPlatforms,
+            review: formData.review || data.gameDetails.review,
+            status: formData.status || data.gameDetails.status
+        }
+
+        try {
+            await updateGame({
+            variables: {id: data.gameDetails.mongoId, input}
+        })
         } catch (err) {
             console.log(err);
         }
@@ -151,6 +179,7 @@ export const GameDetails = () => {
                 {user && (
                     <div className="flex gap-2">
                     {gameAdded ? (
+                        
                         <Button
                         variant="destructive"
                         className="flex-1"
@@ -159,12 +188,93 @@ export const GameDetails = () => {
                         Remove from Backlog
                         </Button>
                     ) : (
-                        <Button
-                        className="flex-1"
-                        onClick={handleAddGame}
-                        >
-                        Add to Backlog
-                        </Button>
+                        <Dialog>
+                            <form>
+                                <DialogTrigger asChild>
+                                    <Button
+                                    className="flex-1"
+                                    >
+                                    Add to Backlog
+                                    </Button>                        
+                                </DialogTrigger>
+                                <DialogContent>
+                                    <DialogHeader>
+                                        <DialogTitle>Edit Game Details</DialogTitle>
+                                        <DialogDescription>
+                                            Fill out some more details
+                                        </DialogDescription>
+                                    </DialogHeader>
+                                    <FieldGroup>
+                                        <Field>
+                                            <Label htmlFor="myRating">Rating:</Label>
+                                                <Rating
+                                                    name="myRating"
+                                                    defaultValue={data.gameDetails.myRating || null}
+                                                    precision={0.5}
+                                                    onChange={handleRatingChange}
+                                                />
+                                        </Field>
+                                        <Field>
+                                            <Label htmlFor="status">Status:</Label>
+                                            <Select onValueChange={(value) => setFormData({...formData, status: value})} defaultValue={data.gameDetails.status}>
+                                                <SelectTrigger>
+                                                    <SelectValue placeholder="Select status" />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    <SelectGroup>
+                                                        <SelectItem value="Playing">Playing</SelectItem>
+                                                        <SelectItem value="Backlog">Backlog</SelectItem>
+                                                        <SelectItem value="Re-playing">Re-playing</SelectItem>
+                                                        <SelectItem value="Completed">Completed</SelectItem>
+                                                    </SelectGroup>
+                                                </SelectContent>
+                                            </Select>
+                                        </Field>
+                                        <FieldSet>
+                                            <FieldLegend>Owned Platforms:</FieldLegend>
+                                            <FieldGroup className="px-3">
+                                                <Field orientation={"horizontal"}>
+                                                    {data.gameDetails.platforms?.map((p: any) => (
+                                                    <div key={p.platform.id}>
+                                                        <Checkbox
+                                                        name={p.platform.name}
+                                                        checked={formData.myPlatforms.includes(p.platform.name)}
+                                                        value={p.platform.name}
+                                                        onCheckedChange={(checked) => {
+                                                            setFormData({
+                                                            ...formData,
+                                                            myPlatforms: checked
+                                                                ? [...formData.myPlatforms, p.platform.name]
+                                                                : formData.myPlatforms.filter((name) => name !== p.platform.name)
+                                                            });
+                                                        }}
+                                                        />
+                                                        <FieldLabel htmlFor={p.platform.name}>
+                                                        {p.platform.name}
+                                                        </FieldLabel>
+                                                    </div>
+                                                    ))}
+                                                </Field>
+                                            </FieldGroup>
+                                        </FieldSet>
+                                        <Field>
+                                            <Label htmlFor="review"> Review: </Label>
+                                            <Textarea 
+                                            name="review" 
+                                            placeholder="Type your review here"
+                                            defaultValue={data.gameDetails.review || ""}
+                                            onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setFormData({
+                                                ...formData,
+                                                review: e.target.value
+                                            })}/>
+                                        </Field>
+                                    </FieldGroup>
+                                    <Button type="submit" onClick={handleAddGame}>
+                                        Add Game
+                                    </Button>
+                                </DialogContent>
+                            </form>
+                        </Dialog>
                     )}
                     {gameAdded && (
                         <Dialog>
@@ -193,9 +303,9 @@ export const GameDetails = () => {
                                         </Field>
                                         <Field>
                                             <Label htmlFor="status">Status:</Label>
-                                            <Select>
+                                            <Select onValueChange={(value) => setFormData({...formData, status: value})} defaultValue={data.gameDetails.status || "Backlog"}>
                                                 <SelectTrigger>
-                                                    <SelectValue defaultValue={data.gameDetails.status || "Backlog"} />
+                                                    <SelectValue />
                                                 </SelectTrigger>
                                                 <SelectContent>
                                                     <SelectGroup onChange={handleChange}>
@@ -211,20 +321,24 @@ export const GameDetails = () => {
                                             <FieldLegend>Owned Platforms:</FieldLegend>
                                             <FieldGroup className="px-3">
                                                 <Field orientation={"horizontal"}>
-                                                    {data.gameDetails.platforms.map((p: any) => (
-                                                        <div>
-                                                            <Checkbox
-                                                            key={p.platform.id}
-                                                            name={p.platform.name}
-                                                            value={p.platform}
-                                                            >
-                                                            </Checkbox>
-                                                            <FieldLabel
-                                                            htmlFor={p.platform.name}
-                                                            >
-                                                            {p.platform.name}
-                                                            </FieldLabel>
-                                                        </div>
+                                                    {data.gameDetails.platforms?.map((p: any) => (
+                                                    <div key={p.platform.id}>
+                                                        <Checkbox
+                                                        name={p.platform.name}
+                                                        checked={formData.myPlatforms.includes(p.platform.name)}
+                                                        onCheckedChange={(checked) => {
+                                                            setFormData({
+                                                            ...formData,
+                                                            myPlatforms: checked
+                                                                ? [...formData.myPlatforms, p.platform.name]
+                                                                : formData.myPlatforms.filter((name) => name !== p.platform.name)
+                                                            });
+                                                        }}
+                                                        />
+                                                        <FieldLabel htmlFor={p.platform.name}>
+                                                        {p.platform.name}
+                                                        </FieldLabel>
+                                                    </div>
                                                     ))}
                                                 </Field>
                                             </FieldGroup>
@@ -241,6 +355,9 @@ export const GameDetails = () => {
                                             })}/>
                                         </Field>
                                     </FieldGroup>
+                                    <Button type="submit" onClick={handleUpdateGame}>
+                                        Update
+                                    </Button>
                                 </DialogContent>
                             </form>
                         </Dialog>
@@ -280,9 +397,9 @@ export const GameDetails = () => {
                 {/* Platforms */}
                 <div className="bg-myLightBlack border border-white/10 rounded-lg p-4">
                     <p className="text-xs uppercase tracking-widest text-white/40 mb-3">Platforms</p>
-                    <div className="flex flex-col gap-1">
+                    <div className="flex flex-wrap gap-2">
                     {data.gameDetails.platforms?.map((p: any) => (
-                        <span key={p.platform.id} className="text-white/70 text-sm">
+                        <span key={p.platform.id} className="text-xs text-white/70 bg-white/5 border border-white/10 rounded-full px-3 py-1">
                         {p.platform.name}
                         </span>
                     ))}
@@ -291,18 +408,16 @@ export const GameDetails = () => {
 
                 {/* Owned Platforms */}
                 {data.gameDetails.myPlatforms?.length > 0 && (
-                    <div className="bg-myLightBlack border border-white/10 rounded-lg p-4">
-                    <p className="text-xs uppercase tracking-widest text-white/40 mb-3">
-                        Your Platforms
-                    </p>
-                    <div className="flex flex-col gap-1">
-                        {data.gameDetails.myPlatforms.map((p: any) => (
-                        <span key={p.platform.id} className="text-white/70 text-sm">
-                            {p.platform.name}
+                <div className="bg-myLightBlack border border-white/10 rounded-lg p-4">
+                    <p className="text-xs uppercase tracking-widest text-white/40 mb-3">Your Platforms</p>
+                    <div className="flex flex-wrap gap-2">
+                    {data.gameDetails.myPlatforms.map((p: string, index: number) => (
+                        <span key={index} className="text-xs text-white/70 bg-white/5 border border-white/10 rounded-full px-3 py-1">
+                        {p}  {/* ← p is just a string now, not an object */}
                         </span>
-                        ))}
+                    ))}
                     </div>
-                    </div>
+                </div>
                 )}
 
                 {data.gameDetails.status && (
