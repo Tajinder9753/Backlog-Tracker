@@ -30,6 +30,7 @@ export const GameDetails = () => {
     })
 
     const [gameAdded, setGameAdded] = useState(false);
+    const [dialogOpen, setDialogOpen] = useState(false);
 
     useEffect(() => {
         if (data?.gameDetails) {
@@ -122,6 +123,7 @@ export const GameDetails = () => {
             await updateGame({
             variables: {id: data.gameDetails.mongoId, input}
         })
+        setDialogOpen(false);
         } catch (err) {
             console.log(err);
         }
@@ -230,33 +232,32 @@ export const GameDetails = () => {
                                                 </SelectContent>
                                             </Select>
                                         </Field>
-                                        <FieldSet>
+                                            <FieldSet>
                                             <FieldLegend>Owned Platforms:</FieldLegend>
                                             <FieldGroup className="px-3">
-                                                <Field orientation={"horizontal"}>
-                                                    {data.gameDetails.platforms?.map((p: any) => (
-                                                    <div key={p.platform.id}>
-                                                        <Checkbox
+                                                <div className="max-h-40 overflow-y-auto pr-2 flex flex-col gap-2">
+                                                {data.gameDetails.platforms?.map((p: any) => (
+                                                    <div key={p.platform.id} className="flex items-center gap-2">
+                                                    <Checkbox
                                                         name={p.platform.name}
-                                                        checked={formData.myPlatforms.includes(p.platform.name) || undefined}
-                                                        value={p.platform.name}
+                                                        checked={formData.myPlatforms.includes(p.platform.name)}
                                                         onCheckedChange={(checked) => {
-                                                            setFormData({
+                                                        setFormData({
                                                             ...formData,
                                                             myPlatforms: checked
-                                                                ? [...formData.myPlatforms, p.platform.name]
-                                                                : formData.myPlatforms.filter((name) => name !== p.platform.name)
-                                                            });
+                                                            ? [...formData.myPlatforms, p.platform.name]
+                                                            : formData.myPlatforms.filter((name) => name !== p.platform.name)
+                                                        });
                                                         }}
-                                                        />
-                                                        <FieldLabel htmlFor={p.platform.name}>
+                                                    />
+                                                    <FieldLabel htmlFor={p.platform.name}>
                                                         {p.platform.name}
-                                                        </FieldLabel>
+                                                    </FieldLabel>
                                                     </div>
-                                                    ))}
-                                                </Field>
+                                                ))}
+                                                </div>
                                             </FieldGroup>
-                                        </FieldSet>
+                                            </FieldSet>
                                         <Field>
                                             <Label htmlFor="review"> Review: </Label>
                                             <Textarea 
@@ -277,10 +278,10 @@ export const GameDetails = () => {
                         </Dialog>
                     )}
                     {user && gameAdded && (
-                        <Dialog>
+                        <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
                             <form>
                                 <DialogTrigger asChild>
-                                    <Button variant="outline" className="flex-1 border-white/10 text-white hover:bg-white/10">
+                                    <Button variant="outline" className="flex-1 border-white/10 text-white hover:bg-white/10" onClick={()=> setDialogOpen(true)}>
                                      Edit
                                     </Button>                         
                                 </DialogTrigger>
@@ -317,32 +318,32 @@ export const GameDetails = () => {
                                                 </SelectContent>
                                             </Select>
                                         </Field>
-                                        <FieldSet>
+                                            <FieldSet>
                                             <FieldLegend>Owned Platforms:</FieldLegend>
                                             <FieldGroup className="px-3">
-                                                <Field orientation={"horizontal"}>
-                                                    {data.gameDetails.platforms?.map((p: any) => (
-                                                    <div key={p.platform.id}>
-                                                        <Checkbox
+                                                <div className="max-h-40 overflow-y-auto pr-2 flex flex-col gap-2">
+                                                {data.gameDetails.platforms?.map((p: any) => (
+                                                    <div key={p.platform.id} className="flex items-center gap-2">
+                                                    <Checkbox
                                                         name={p.platform.name}
                                                         checked={formData.myPlatforms.includes(p.platform.name)}
                                                         onCheckedChange={(checked) => {
-                                                            setFormData({
+                                                        setFormData({
                                                             ...formData,
                                                             myPlatforms: checked
-                                                                ? [...formData.myPlatforms, p.platform.name]
-                                                                : formData.myPlatforms.filter((name) => name !== p.platform.name)
-                                                            });
+                                                            ? [...formData.myPlatforms, p.platform.name]
+                                                            : formData.myPlatforms.filter((name) => name !== p.platform.name)
+                                                        });
                                                         }}
-                                                        />
-                                                        <FieldLabel htmlFor={p.platform.name}>
+                                                    />
+                                                    <FieldLabel htmlFor={p.platform.name}>
                                                         {p.platform.name}
-                                                        </FieldLabel>
+                                                    </FieldLabel>
                                                     </div>
-                                                    ))}
-                                                </Field>
+                                                ))}
+                                                </div>
                                             </FieldGroup>
-                                        </FieldSet>
+                                            </FieldSet>
                                         <Field>
                                             <Label htmlFor="review"> Review: </Label>
                                             <Textarea 
