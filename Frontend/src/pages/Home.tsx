@@ -17,6 +17,7 @@ import {
 import { useEffect, useState } from "react";
 import { useUser } from "@/Hooks/useUser";
 import { useNavigate } from "react-router-dom";
+import Footer from "@/components/Footer";
 
 const TOTAL_PAGES = 50;
 
@@ -200,6 +201,7 @@ export const Home = () => {
         )}
 
       </div>
+      <Footer />
     </div>
   );
 };

@@ -12,6 +12,7 @@ import { Field, FieldGroup, FieldLabel, FieldLegend, FieldSet } from "@/componen
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
+import Footer from "@/components/Footer";
 
 export const GameDetails = () => {
     const {user} = useUser();
@@ -431,6 +432,7 @@ export const GameDetails = () => {
                 </div>
             </div>
             </div>
+            <Footer />
         </>
     )
 }

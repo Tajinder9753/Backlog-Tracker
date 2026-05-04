@@ -2,6 +2,7 @@ import { GET_MY_GAMES } from "@/graphql/queries"
 import { useUser } from "@/Hooks/useUser"
 import { useQuery } from "@apollo/client"
 import { GameGrid } from "@/components/GameGrid"
+import Footer from "@/components/Footer"
 
 export const Dashboard = () => {
     const {user} = useUser()
@@ -48,7 +49,7 @@ return (
         </div>
       )}
     </div>
-
+      <Footer />
   </div>
 );
 }

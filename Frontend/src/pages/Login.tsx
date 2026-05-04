@@ -6,6 +6,7 @@ import { GET_USER } from "../graphql/queries";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
+import Footer from "@/components/Footer";
 
 export const Login = () => {
 
@@ -85,7 +86,7 @@ export const Login = () => {
             </p>
         </div>
       </div>
-
+      <Footer />
       </>
     )
 }
