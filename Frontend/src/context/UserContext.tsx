@@ -1,5 +1,5 @@
 import { createContext, useState } from "react";
-import { useQuery, useMutation, ApolloError } from "@apollo/client";
+import { useQuery, useMutation, ApolloError, useApolloClient } from "@apollo/client";
 import { GET_USER } from "../graphql/queries";
 import { LOGIN_USER, REGISTER_USER, LOGOUT_USER } from "../graphql/mutations";
 
@@ -22,6 +22,8 @@ export const UserContext = createContext<UserContextType | undefined>(undefined)
 
 export function UserProvider({ children }: { children: React.ReactNode }) {
     const [message, setMessage] = useState("");
+
+    const client = useApolloClient();
 
     const {data: userData, loading: loadingUser, error: userError} = useQuery(GET_USER, {
         fetchPolicy: "network-only"
@@ -77,6 +79,9 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     {
         try {
             await logoutUser();
+            //reset games so when a new user signs in it does not show the data from the old user
+            client.cache.evict({fieldName: "getGames"});
+            client.cache.gc();
             setMessage("Logout successful");
         } catch (err) {
             console.error("Logout failed:", err);
